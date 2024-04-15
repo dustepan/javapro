@@ -26,18 +26,9 @@ public class ThreadPoolCustom {
                         }
                     }
                 }
-                while (!runnableList.isEmpty()) {
-                    try {
-                    runnableList.removeFirst().run();
-                    Thread.sleep(20);
-                    } catch (Exception e){
-                        //здесь иногда возникает удаление из листста двумя потоками одновременно,
-                        // к сожалению идей как это починить не пришло. При синхронизации начинает работать некорректно код.
-                        //То есть выполнять задачи в одном потоке. Если у Вас есть решение данной проблемы, буду рад его выслушать.
-                        //При добалвении sleep проблемы более не наблюдал
-                    }
+                while (!listIsEmpty()) {
+                    runnable().run();
                 }
-
             }).start();
         }
     }
@@ -56,6 +47,19 @@ public class ThreadPoolCustom {
 
     public void shutdown() {
         aBoolean.set(false);
+        Thread.currentThread().interrupt();
+    }
+
+    private boolean listIsEmpty() {
+        synchronized (obj) {
+            return runnableList.isEmpty();
+        }
+    }
+
+    private Runnable runnable() {
+        synchronized (obj) {
+            return runnableList.removeFirst();
+        }
     }
 
 }
