@@ -1,42 +1,49 @@
 package taskthree;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.List;
 
 /**
  * @author SDudin
  */
 public class ThreadPoolCustom {
 
-    LinkedList<Runnable> runnableList = new LinkedList<>();
-    final Object obj = new Object();
-    AtomicBoolean aBoolean = new AtomicBoolean(true);
+    private LinkedList<Runnable> runnableList = new LinkedList<>();
+    private List<Thread> threadList = new ArrayList<>();
+    private final Object obj = new Object();
+    private volatile boolean isShutdown = false;
 
-
-    public ThreadPoolCustom(int countPool) throws InterruptedException {
+    public ThreadPoolCustom(int countPool) {
         for (int i = 0; i < countPool; i++) {
-            new Thread(() -> {
-                synchronized (obj) {
-                    while (runnableList.isEmpty()) {
-                        try {
-                            obj.wait();
-                        } catch (InterruptedException e) {
-                            Thread.currentThread().interrupt();
-                            e.printStackTrace();
+            Thread thread = new Thread(() -> {
+                while (true) {
+                    synchronized (obj) {
+                        while (listIsEmpty()) {
+                            try {
+                                obj.wait();
+                            } catch (InterruptedException e) {
+                                Thread.currentThread().interrupt();
+                            }
                         }
                     }
+                    if (!listIsEmpty()) {
+                        runnable().run();
+                    }
+                    if (listIsEmpty() && isShutdown) {
+                        return;
+                    }
                 }
-                while (!listIsEmpty()) {
-                    runnable().run();
-                }
-            }).start();
+            });
+            threadList.add(thread);
+            threadList.get(i).start();
         }
     }
 
 
     public void execute(Runnable runnable) {
         synchronized (obj) {
-            if (aBoolean.get()) {
+            if (!isShutdown) {
                 runnableList.add(runnable);
                 obj.notifyAll();
             } else {
@@ -46,8 +53,10 @@ public class ThreadPoolCustom {
     }
 
     public void shutdown() {
-        aBoolean.set(false);
-        Thread.currentThread().interrupt();
+        isShutdown = true;
+        for (Thread thread : threadList) {
+            thread.interrupt();
+        }
     }
 
     private boolean listIsEmpty() {
