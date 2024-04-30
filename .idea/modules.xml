@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/java-pro-tasks.iml" filepath="$PROJECT_DIR$/java-pro-tasks.iml" />
+      <module fileurl="file://$PROJECT_DIR$/taskfive/taskfive.iml" filepath="$PROJECT_DIR$/taskfive/taskfive.iml" />
+      <module fileurl="file://$PROJECT_DIR$/taskfour/taskfour.iml" filepath="$PROJECT_DIR$/taskfour/taskfour.iml" />
     </modules>
   </component>
 </project>
