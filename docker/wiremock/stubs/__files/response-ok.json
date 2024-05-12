@@ -1,0 +1,16 @@
+{
+  "list": [
+    {
+      "productId": "1",
+      "accountNumber": "12",
+      "balance": "100",
+      "productType": "ACCOUNT"
+    },
+    {
+      "productId": "2",
+      "accountNumber": "123",
+      "balance": "0",
+      "productType": "CARD"
+    }
+  ]
+}
