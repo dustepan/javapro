@@ -1,0 +1,5 @@
+integration:
+ custom:
+  url: 'localhost:8080'
+  connect-timeout: 15
+  read-timeout: 15
