@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/test_db
+    username: postgres
+    password: 1111
+  jpa:
+    show-sql: true
+    open-in-view: false
+
+sbp-limits: 10000.00
