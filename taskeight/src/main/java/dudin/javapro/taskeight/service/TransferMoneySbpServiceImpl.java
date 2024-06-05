@@ -7,6 +7,7 @@ import dudin.javapro.taskeight.repository.TransferSpbRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 /**
@@ -15,14 +16,12 @@ import java.util.Set;
 @Service
 public class TransferMoneySbpServiceImpl implements TransferMoneyService {
     @Value("sbp-limits")
-    private Long limits;
+    private BigDecimal limits;
 
     private final TransferSpbRepository transferSpbRepository;
-    private final PaymentsService paymentsService;
 
-    public TransferMoneySbpServiceImpl(TransferSpbRepository transferSpbRepository, PaymentsService paymentsService) {
+    public TransferMoneySbpServiceImpl(TransferSpbRepository transferSpbRepository) {
         this.transferSpbRepository = transferSpbRepository;
-        this.paymentsService = paymentsService;
     }
 
     @Override
@@ -37,12 +36,9 @@ public class TransferMoneySbpServiceImpl implements TransferMoneyService {
 
     private void updateLimitsSbpForExistingUser(TransferRequestBody transferRequestBody) {
         UserEntity repositoryUser = transferSpbRepository.getUser(transferRequestBody.getUserId());
-        if (repositoryUser.getSbpLimits() >= transferRequestBody.getSbpTransfer()) {
-            Boolean transferMoneyForUser = paymentsService.transferMoneyForUser(transferRequestBody.getSbpTransfer());
-            if (transferMoneyForUser) {
-                Long newLimit = repositoryUser.getSbpLimits() - transferRequestBody.getSbpTransfer();
-                transferSpbRepository.updateSbpLimits(transferRequestBody.getUserId(), newLimit);
-            }
+        if (repositoryUser.getSbpLimits().compareTo(transferRequestBody.getSbpTransfer()) >= 0) {
+            BigDecimal newLimit = repositoryUser.getSbpLimits().subtract(transferRequestBody.getSbpTransfer());
+            transferSpbRepository.updateSbpLimits(transferRequestBody.getUserId(), newLimit);
         } else {
             throw new TransferException("Лимит превышен");
         }
@@ -50,10 +46,7 @@ public class TransferMoneySbpServiceImpl implements TransferMoneyService {
 
     private void saveNewUserAndUpdateLimitsSbp(TransferRequestBody transferRequestBody) {
         transferSpbRepository.saveUser(new UserEntity(transferRequestBody.getUserId(), transferRequestBody.getUserName(), limits));
-        Boolean transferMoneyForUser = paymentsService.transferMoneyForUser(transferRequestBody.getSbpTransfer());
-        if (transferMoneyForUser) {
-            Long newLimit = limits - transferRequestBody.getSbpTransfer();
-            transferSpbRepository.updateSbpLimits(transferRequestBody.getUserId(), newLimit);
-        }
+        BigDecimal newLimit = limits.subtract(transferRequestBody.getSbpTransfer());
+        transferSpbRepository.updateSbpLimits(transferRequestBody.getUserId(), newLimit);
     }
 }

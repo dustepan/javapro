@@ -2,6 +2,8 @@ package dudin.javapro.taskeight.dto;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 /**
  * @author SDudin
  */
@@ -9,5 +11,5 @@ import lombok.Data;
 public class TransferRequestBody {
     private Long userId;
     private String userName;
-    private Long sbpTransfer;
+    private BigDecimal sbpTransfer;
 }

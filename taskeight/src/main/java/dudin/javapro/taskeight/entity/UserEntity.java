@@ -6,9 +6,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.math.BigDecimal;
 
 /**
  * @author SDudin
@@ -27,9 +28,9 @@ public class UserEntity {
     private String userName;
 
     @Column(name = "spb_limits")
-    private Long sbpLimits;
+    private BigDecimal sbpLimits;
 
-    public UserEntity(Long userId, String userName, Long sbpLimits) {
+    public UserEntity(Long userId, String userName, BigDecimal sbpLimits) {
         this.userId = userId;
         this.userName = userName;
         this.sbpLimits = sbpLimits;

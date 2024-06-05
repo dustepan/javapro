@@ -9,13 +9,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
+
 /**
  * @author SDudin
  */
 @RestController
 public class TransferMoneyController {
     @Value("sbp-limits")
-    private Long limits;
+    private BigDecimal limits;
     private final TransferMoneyService transferMoneyService;
 
     public TransferMoneyController(TransferMoneyService transferMoneyService) {
@@ -27,7 +29,7 @@ public class TransferMoneyController {
         if (transferRequestBody.getUserId() > 100 || transferRequestBody.getUserId() < 1) {
             throw new TransferException("Некорректный userId, принимаемые значения id 1-100");
         }
-        if (transferRequestBody.getSbpTransfer() > limits){
+        if (transferRequestBody.getSbpTransfer().compareTo(limits) > 0) {
             throw new TransferException("Перевод невозможен из за ограничений по лимиту");
         }
         transferMoneyService.doTransferMoney(transferRequestBody);
